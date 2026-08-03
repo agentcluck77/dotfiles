@@ -1,0 +1,52 @@
+# ── Personal machines ──────────────────────────────────────────────────────────
+Host aloy-jetson
+    HostName 100.66.244.120
+
+Host aloy-fedora
+    HostName 100.97.74.121
+
+Host aloy-mbp
+    HostName 100.96.112.76
+
+Host aloy-pi5
+    HostName 100.65.21.95
+
+Host chia-macmini
+    HostName 100.66.166.97
+
+Host fedoramac
+    HostName 100.120.148.24
+
+Host jetson-nano
+    HostName 100.116.117.113
+
+Host ubuntu-mac14
+    HostName 100.91.82.12 
+
+Host h170
+    HostName 100.88.47.99
+
+# ── Shared / other machines ────────────────────────────────────────────────────
+Host fedora-makers
+    HostName 100.103.111.75
+    User rep-makers
+
+Host aav-sim
+    HostName 100.82.232.99
+    User robotx
+
+Host aav-orinnx
+    HostName 100.81.70.104
+    User ntusuas # ntu-aav-orin-nx-1
+
+# ── Global defaults ────────────────────────────────────────────────────────────
+Host *
+    User aloy
+    IdentityFile ~/.ssh/id_ed25519
+    AddKeysToAgent yes
+    ForwardAgent yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+    ControlMaster auto
+    ControlPath ~/.ssh/cm_%r@%h:%p
+    ControlPersist 10m

@@ -1,0 +1,8 @@
+README.md
+install-devcontainer.sh
+scripts
+docs
+{{ if eq .chezmoi.os "darwin" }}
+.config/copyq
+.config/copyq/**
+{{ end }}

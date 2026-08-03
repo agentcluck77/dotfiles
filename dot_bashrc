@@ -1,0 +1,48 @@
+# Homebrew (Linux) — must be first so brew-installed tools are on PATH
+if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+elif [[ -f "$HOME/.linuxbrew/bin/brew" ]]; then
+    eval "$("$HOME/.linuxbrew/bin/brew" shellenv)"
+fi
+
+# History
+HISTFILE=~/.bash_history
+HISTSIZE=10000
+HISTFILESIZE=10000
+HISTCONTROL=ignoredups:erasedups
+shopt -s histappend  # append instead of overwrite on exit
+
+# Better tab completion
+if command -v brew &>/dev/null; then
+    [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && \
+        source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+else
+    [[ -f /usr/share/bash-completion/bash_completion ]] && \
+        source /usr/share/bash-completion/bash_completion
+fi
+
+# ── fzf (fuzzy CTRL-R history, CTRL-T files, ALT-C dirs) ──────────────────────
+if command -v fzf &>/dev/null; then
+    if fzf --bash &>/dev/null 2>&1; then
+        eval "$(fzf --bash)"
+    else
+        _src() { [ -f "$1" ] && source "$1"; }
+        if command -v brew &>/dev/null; then
+            _src "$(brew --prefix)/opt/fzf/shell/key-bindings.bash"
+            _src "$(brew --prefix)/opt/fzf/shell/completion.bash"
+        else
+            _src /usr/share/doc/fzf/examples/key-bindings.bash  # Ubuntu/Debian
+            _src /usr/share/fzf/shell/key-bindings.bash         # Fedora/Arch
+        fi
+        unset -f _src
+    fi
+fi
+
+# ── Starship prompt ────────────────────────────────────────────────────────────
+command -v starship &>/dev/null && eval "$(starship init bash)"
+
+# ── zoxide (smart cd — use `z <partial-dir>` instead of cd) ───────────────────
+command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
+
+# Note: zsh-autosuggestions and zsh-syntax-highlighting are zsh-only (macOS/zsh setup).
+# On Linux/bash the main fish-like feature available is fzf.
