@@ -2,14 +2,8 @@
 Host aloy-jetson
     HostName 100.66.244.120
 
-Host aloy-fedora
-    HostName 100.97.74.121
-
 Host aloy-mbp
     HostName 100.96.112.76
-
-Host aloy-pi5
-    HostName 100.65.21.95
 
 Host chia-macmini
     HostName 100.66.166.97
