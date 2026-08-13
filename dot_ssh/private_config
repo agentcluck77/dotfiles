@@ -15,7 +15,7 @@ Host chia-macmini
     HostName 100.66.166.97
 
 Host fedoramac
-    HostName 100.120.148.24
+    HostName 100.118.87.107
 
 Host jetson-nano
     HostName 100.116.117.113
@@ -29,7 +29,7 @@ Host h170
 # ── Shared / other machines ────────────────────────────────────────────────────
 Host fedora-makers
     HostName 100.103.111.75
-    User rep-makers
+    User makers
 
 Host aav-sim
     HostName 100.82.232.99
