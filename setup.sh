@@ -55,7 +55,7 @@ install_packages() {
   step "Packages"
 
   brew install fzf zsh-autosuggestions zsh-syntax-highlighting zoxide starship chezmoi \
-    git-delta lazygit fd neovim node wakeonlan devcontainer
+    git-delta lazygit fd neovim node wakeonlan devcontainer bash-completion@2 tmux zsh-completions
 
   if command -v npm >/dev/null 2>&1; then
     npm install -g neovim

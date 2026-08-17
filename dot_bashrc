@@ -12,28 +12,60 @@ HISTFILESIZE=10000
 HISTCONTROL=ignoredups:erasedups
 shopt -s histappend  # append instead of overwrite on exit
 
-# Better tab completion
+# ── Completions ───────────────────────────────────────────────────────────────
+# Cache dir for generated completions
+_BASH_COMP_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/bash/completions"
+mkdir -p "$_BASH_COMP_CACHE"
+
+# bash-completion v2: set user dir so it lazy-loads our cache on tab (brew/Linux v2)
+export BASH_COMPLETION_USER_DIR="$_BASH_COMP_CACHE"
+
+# Load the bash-completion framework (must come after BASH_COMPLETION_USER_DIR)
 if command -v brew &>/dev/null; then
     [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && \
         source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
-else
-    [[ -f /usr/share/bash-completion/bash_completion ]] && \
-        source /usr/share/bash-completion/bash_completion
 fi
+
+# Generate and cache — only regenerates when the binary is newer than the cache.
+_cache_completion() {
+    local cmd="$1"; shift
+    command -v "$cmd" &>/dev/null || return
+    local f="$_BASH_COMP_CACHE/completions/${cmd}"
+    [[ -f "$f" && "$(command -v $cmd)" -ot "$f" ]] || \
+        { "$@" > "$f" 2>/dev/null || rm -f "$f"; }
+}
+
+# ── Add/remove lines here to enable completions for more tools ────────────────
+_cache_completion uv       uv generate-shell-completion bash
+_cache_completion uvx      uvx --generate-shell-completion bash
+_cache_completion gh       gh completion -s bash
+_cache_completion docker   docker completion bash
+_cache_completion kubectl  kubectl completion bash
+_cache_completion helm     helm completion bash
+_cache_completion rustup   rustup completions bash
+_cache_completion cargo    rustup completions bash cargo
+_cache_completion chezmoi  chezmoi completion bash
+_cache_completion op       op completion bash
+_cache_completion poetry   poetry completions bash
+_cache_completion deno     deno completions bash
+_cache_completion just     just --completions bash
+_cache_completion mise     mise completion bash
+_cache_completion atuin    atuin gen-completions --shell bash
+_cache_completion fly      fly completion bash
+_cache_completion stripe   stripe completion --shell bash
+# ─────────────────────────────────────────────────────────────────────────────
+
+unset -f _cache_completion
+unset _BASH_COMP_CACHE
 
 # ── fzf (fuzzy CTRL-R history, CTRL-T files, ALT-C dirs) ──────────────────────
 if command -v fzf &>/dev/null; then
     if fzf --bash &>/dev/null 2>&1; then
         eval "$(fzf --bash)"
-    else
+    elif command -v brew &>/dev/null; then
         _src() { [ -f "$1" ] && source "$1"; }
-        if command -v brew &>/dev/null; then
-            _src "$(brew --prefix)/opt/fzf/shell/key-bindings.bash"
-            _src "$(brew --prefix)/opt/fzf/shell/completion.bash"
-        else
-            _src /usr/share/doc/fzf/examples/key-bindings.bash  # Ubuntu/Debian
-            _src /usr/share/fzf/shell/key-bindings.bash         # Fedora/Arch
-        fi
+        _src "$(brew --prefix)/opt/fzf/shell/key-bindings.bash"
+        _src "$(brew --prefix)/opt/fzf/shell/completion.bash"
         unset -f _src
     fi
 fi

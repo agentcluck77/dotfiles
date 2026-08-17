@@ -4,7 +4,48 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
 
-# Completion
+# ── Completions (fpath + cache must come before compinit) ─────────────────────
+# `brew install zsh-completions` covers 300+ tools automatically
+if command -v brew &>/dev/null; then
+    fpath+=("$(brew --prefix)/share/zsh-completions" "$(brew --prefix)/share/zsh/site-functions")
+fi
+
+# Cache generated completions — only regenerates when the binary is updated
+_ZSH_COMP_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
+mkdir -p "$_ZSH_COMP_CACHE"
+fpath+=("$_ZSH_COMP_CACHE")
+
+_cache_completion() {
+    local cmd="$1"; shift
+    command -v "$cmd" &>/dev/null || return
+    local f="$_ZSH_COMP_CACHE/_${cmd}"
+    [[ -f "$f" && "$(command -v $cmd)" -ot "$f" ]] && return
+    "$@" > "$f" 2>/dev/null || rm -f "$f"
+}
+
+# ── Add/remove lines here to enable completions for more tools ────────────────
+_cache_completion uv       uv generate-shell-completion zsh
+_cache_completion uvx      uvx --generate-shell-completion zsh
+_cache_completion gh       gh completion -s zsh
+_cache_completion docker   docker completion zsh
+_cache_completion kubectl  kubectl completion zsh
+_cache_completion helm     helm completion zsh
+_cache_completion rustup   rustup completions zsh
+_cache_completion cargo    rustup completions zsh cargo
+_cache_completion chezmoi  chezmoi completion zsh
+_cache_completion op       op completion zsh
+_cache_completion poetry   poetry completions zsh
+_cache_completion deno     deno completions zsh
+_cache_completion just     just --completions zsh
+_cache_completion mise     mise completion zsh
+_cache_completion atuin    atuin gen-completions --shell zsh
+_cache_completion fly      fly completion zsh
+_cache_completion stripe   stripe completion --shell zsh
+# ─────────────────────────────────────────────────────────────────────────────
+
+unset -f _cache_completion
+unset _ZSH_COMP_CACHE
+
 autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive
@@ -14,17 +55,10 @@ if command -v fzf &>/dev/null; then
     # fzf 0.48+ ships its own shell integration
     if fzf --zsh &>/dev/null 2>&1; then
         eval "$(fzf --zsh)"
-    else
+    elif command -v brew &>/dev/null; then
         _src() { [ -f "$1" ] && source "$1"; }
-        if command -v brew &>/dev/null; then
-            _src "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
-            _src "$(brew --prefix)/opt/fzf/shell/completion.zsh"
-        else
-            # Ubuntu
-            _src /usr/share/doc/fzf/examples/key-bindings.zsh
-            # Fedora / Arch
-            _src /usr/share/fzf/shell/key-bindings.zsh
-        fi
+        _src "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
+        _src "$(brew --prefix)/opt/fzf/shell/completion.zsh"
         unset -f _src
     fi
 fi
@@ -33,18 +67,12 @@ fi
 _src() { [ -f "$1" ] && source "$1" && return 0; return 1; }
 if command -v brew &>/dev/null; then
     _src "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-else
-    _src /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ||           # Ubuntu/Debian
-    _src /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh  # Fedora/Arch
 fi
 
 # ── zsh-syntax-highlighting (fish-like command colouring) ─────────────────────
 # must be sourced last
 if command -v brew &>/dev/null; then
     _src "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-else
-    _src /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ||           # Ubuntu/Debian
-    _src /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh  # Fedora/Arch
 fi
 unset -f _src
 

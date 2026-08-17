@@ -20,6 +20,9 @@ Host ubuntu-mac14
 Host h170
     HostName 100.88.47.99
 
+Host aloy-pi5
+    HostName 100.109.190.15
+
 # ── Shared / other machines ────────────────────────────────────────────────────
 Host fedora-makers
     HostName 100.103.111.75
