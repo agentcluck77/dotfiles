@@ -1,10 +1,20 @@
 #!/bin/sh
 # Set up dotfiles on a new machine.
 # Safe to re-run: existing installs and chezmoi state are reused where possible.
+#
+# Flags:
+#   --nix   Install Nix (single-user) in addition to the standard setup.
 set -eu
 
 DOTFILES_REPO="https://github.com/agentcluck77/dotfiles"
 DOTFILES_DIR="$HOME/dotfiles"
+INSTALL_NIX=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --nix) INSTALL_NIX=1 ;;
+  esac
+done
 
 step() {
   echo ""
@@ -19,6 +29,19 @@ ensure_alpine_packages() {
   step "Alpine essentials"
 
   apk add git curl openssh-client chezmoi
+}
+
+ensure_nix() {
+  step "Nix (single-user)"
+
+  if command -v nix >/dev/null 2>&1; then
+    echo "  Already installed: $(nix --version)"
+    return
+  fi
+
+  sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon
+  # Source for the remainder of this script session
+  [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ] && . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 }
 
 ensure_homebrew() {
@@ -144,6 +167,7 @@ if is_alpine; then
   apply_dotfiles
   print_alpine_next_steps
 else
+  [ "$INSTALL_NIX" = "1" ] && ensure_nix
   ensure_homebrew
   sync_dotfiles_repo
   install_packages

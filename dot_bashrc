@@ -1,9 +1,17 @@
+# Nix
+[ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ] && . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+
 # Homebrew (Linux) — must be first so brew-installed tools are on PATH
 if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 elif [[ -f "$HOME/.linuxbrew/bin/brew" ]]; then
     eval "$("$HOME/.linuxbrew/bin/brew" shellenv)"
 fi
+
+# Editor
+export EDITOR="nvim"
+export VISUAL="nvim"
+export SUDO_EDITOR="nvim"
 
 # History
 HISTFILE=~/.bash_history
