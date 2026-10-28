@@ -23,7 +23,7 @@ shopt -s histappend  # append instead of overwrite on exit
 # ── Completions ───────────────────────────────────────────────────────────────
 # Cache dir for generated completions
 _BASH_COMP_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/bash/completions"
-mkdir -p "$_BASH_COMP_CACHE"
+mkdir -p "$_BASH_COMP_CACHE/completions"
 
 # bash-completion v2: set user dir so it lazy-loads our cache on tab (brew/Linux v2)
 export BASH_COMPLETION_USER_DIR="$_BASH_COMP_CACHE"
